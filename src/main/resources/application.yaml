@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: tracking-system
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    url: /open-api.yaml

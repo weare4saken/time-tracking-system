@@ -1,0 +1,186 @@
+openapi: 3.0.1
+info:
+  title: 'Tracking System API'
+  description: 'OpenApi documentation'
+  contact:
+    name: 'Ilya Kondratyuk'
+    url: 'https://github.com/weare4saken/'
+    email: 'kondrashka91@gmail.com'
+  version: '1.0'
+servers:
+  - url: 'http://localhost:8080'
+    description: 'Local ENV'
+paths:
+  /api/v1/trackingtime/stats:
+    get:
+      tags:
+        - Methods Execution Time Tracking Controller
+      summary: 'Get endpoint to get all the data'
+      description: 'Get endpoint to get all the statistics data on methods execution time'
+      operationId: getTrackTimeStats
+      parameters:
+        - name: view
+          description: '
+            View type of result data:<br>
+            **all** - methods data and summary statistics<br>
+            **data** - only methods data<br>
+            **summary** - only summary statistics<br><br>'
+          in: query
+          required: false
+          schema:
+            type: string
+            default: 'all'
+          examples:
+            all:
+              value: 'all'
+              summary: 'Data and summary'
+            data:
+              value: 'data'
+              summary: 'Only methods data'
+            summary:
+              value: 'summary'
+              summary: 'Only summary'
+        - name: short
+          description: 'Represent methods data in a short format (method names and execution time only)'
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          $ref: '#/components/responses/OkResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+components:
+  schemas:
+    Request:
+      description: 'Search request'
+      type: object
+      properties:
+        groupName:
+          type: string
+        returnType:
+          type: string
+        packageName:
+          type: string
+        className:
+          type: string
+        methodName:
+          type: string
+        parameters:
+          type: string
+        status:
+          type: string
+          enum:
+            - completed
+            - exception
+        createdAt:
+          type: string
+          format: date
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+    Response:
+      description: 'Data response'
+      type: object
+      properties:
+        groupName:
+          type: string
+        returnType:
+          type: string
+        packageName:
+          type: string
+        className:
+          type: string
+        methodName:
+          type: string
+        parameters:
+          type: string
+        executionTime:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+            - completed
+            - exception
+        createdAt:
+          type: string
+          format: date-time
+    Response_Short:
+      description: 'Short data response'
+      type: object
+      properties:
+        methodName:
+          type: string
+        executionTime:
+          type: integer
+          format: int64
+          readOnly: true
+    Error:
+      description: 'Error response'
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        description:
+          type: string
+  responses:
+    OkResponse:
+      description: 'Response object'
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - description: "full format response"
+                type: object
+                properties:
+                  result:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Response'
+                  summary:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      min:
+                        type: integer
+                      max:
+                        type: integer
+                      average:
+                        type: integer
+              - description: 'short format response'
+                type: object
+                properties:
+                  result:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Response_Short'
+                  summary:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+                      min:
+                        type: integer
+                      max:
+                        type: integer
+                      average:
+                        type: integer
+    ErrorResponse:
+      description: 'Error object'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
